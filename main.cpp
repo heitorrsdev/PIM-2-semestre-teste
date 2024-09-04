@@ -73,12 +73,12 @@ bool Confirm(const string& prompt) {
 // Obtém entrada do usuário com limpeza de buffer
 string InputWithClear(const string& prompt) {
     string input;
-    do {
+    while (input.empty()) {
         cout << prompt;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, input);
         ClearScreen();
-    } while (input.empty());
+    }
     return input;
 }
 
@@ -274,7 +274,7 @@ void ShowEmployeeMenu() {
 void HandleAdminMenu() {
     MenuOptionAdmin option;
     int choice;
-    do {
+    while (option != MenuOptionAdmin::Exit) {
         ShowAdminMenu();
         cin >> choice;
         option = static_cast<MenuOptionAdmin>(choice);
@@ -283,39 +283,47 @@ void HandleAdminMenu() {
             case MenuOptionAdmin::AddSupplier:
                 AddSuppliers();
                 break;
+
             case MenuOptionAdmin::ReadSuppliers:
                 ReadSuppliers();
                 break;
+
             case MenuOptionAdmin::AddStock:
                 AddStockItem();
                 break;
+
             case MenuOptionAdmin::ReadStock:
                 ReadStock();
                 break;
+
             case MenuOptionAdmin::AddLogin:
                 AddLogin();
                 break;
+
             case MenuOptionAdmin::ReadLogins:
                 ReadLogins();
                 break;
+
             case MenuOptionAdmin::Exit:
                 cout << "Saindo, aguarde..." << endl;
                 Pause(2);
                 break;
+                
             default:
                 cout << "Opção inválida, tente novamente." << endl;
                 Pause(2);
                 break;
         }
         ClearScreen();
-    } while (option != MenuOptionAdmin::Exit);
+
+    }
 }
 
 // Gerencia o menu do funcionário
 void HandleEmployeeMenu() {
     MenuOptionEmployee option;
     int choice;
-    do {
+    while (option != MenuOptionEmployee::Exit) {
         ShowEmployeeMenu();
         cin >> choice;
         option = static_cast<MenuOptionEmployee>(choice);
@@ -337,7 +345,7 @@ void HandleEmployeeMenu() {
                 break;
         }
         ClearScreen();
-    } while (option != MenuOptionEmployee::Exit);
+    }
 }
 
 // Função principal
