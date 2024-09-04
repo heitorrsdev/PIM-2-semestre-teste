@@ -6,76 +6,77 @@
 #include <limits>
 #include <functional>
 #include <iomanip>
+using namespace std;
 
 // Gerenciador de banco de dados para manipulação de arquivos
 class DatabaseManager {
 public:
     // Obtém o último ID registrado no arquivo
-    static int GetLastID(const std::string& filepath) {
-        std::ifstream file(filepath);
+    static int GetLastID(const string& filepath) {
+        ifstream file(filepath);
         if (!file) {
-            std::cerr << "Erro ao abrir o arquivo: " << filepath << std::endl;
+            cerr << "Erro ao abrir o arquivo: " << filepath << endl;
             return -1;
         }
-        std::string line, lastID;
+        string line, lastID;
         while (getline(file, line)) {
-            std::stringstream ss(line);
+            stringstream ss(line);
             getline(ss, lastID, ',');
         }
-        return lastID.empty() ? 0 : std::stoi(lastID);
+        return lastID.empty() ? 0 : stoi(lastID);
     }
 
     // Adiciona dados ao final do arquivo
-    static void AppendToFile(const std::string& filepath, const std::string& data) {
-        std::ofstream file(filepath, std::ios::app);
+    static void AppendToFile(const string& filepath, const string& data) {
+        ofstream file(filepath, ios::app);
         if (file.is_open()) {
-            file << data << std::endl;
+            file << data << endl;
         } else {
-            std::cerr << "Erro ao abrir o arquivo: " << filepath << std::endl;
+            cerr << "Erro ao abrir o arquivo: " << filepath << endl;
         }
     }
 
     // Exibe o conteúdo do arquivo no console
-    static void DisplayFileContents(const std::string& filepath) {
-        std::ifstream file(filepath);
+    static void DisplayFileContents(const string& filepath) {
+        ifstream file(filepath);
         if (!file) {
-            std::cerr << "Erro ao abrir o arquivo: " << filepath << std::endl;
+            cerr << "Erro ao abrir o arquivo: " << filepath << endl;
             return;
         }
-        std::string line;
-        std::cout << "______________________________" << std::endl;
+        string line;
+        cout << "______________________________" << endl;
         while (getline(file, line)) {
-            std::cout << line << std::endl;
-            std::cout << "______________________________" << std::endl;
+            cout << line << endl;
+            cout << "______________________________" << endl;
         }
     }
 };
 
 // Limpa a tela usando código de escape ANSI
 void ClearScreen() {
-    std::cout << "\033[2J\033[1;1H";
+    cout << "\033[2J\033[1;1H";
 }
 
 // Pausa a execução do programa por um determinado número de segundos
 void Pause(int seconds) {
-    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    this_thread::sleep_for(chrono::seconds(seconds));
 }
 
 // Solicita uma confirmação do usuário
-bool Confirm(const std::string& prompt) {
-    std::string option;
-    std::cout << prompt << " (S/N): ";
-    std::cin >> option;
+bool Confirm(const string& prompt) {
+    string option;
+    cout << prompt << " (S/N): ";
+    cin >> option;
     return option == "S" || option == "s";
 }
 
 // Obtém entrada do usuário com limpeza de buffer
-std::string InputWithClear(const std::string& prompt) {
-    std::string input;
+string InputWithClear(const string& prompt) {
+    string input;
     do {
-        std::cout << prompt;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        getline(std::cin, input);
+        cout << prompt;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        getline(cin, input);
         ClearScreen();
     } while (input.empty());
     return input;
@@ -83,31 +84,31 @@ std::string InputWithClear(const std::string& prompt) {
 
 // Função para adicionar fornecedores ao sistema
 void AddSuppliers() {
-    std::string name = InputWithClear("Nome: ");
-    std::string company = InputWithClear("Empresa: ");
-    std::string contact = InputWithClear("Contato: ");
-    std::string description = InputWithClear("Descrição: ");
+    string name = InputWithClear("Nome: ");
+    string company = InputWithClear("Empresa: ");
+    string contact = InputWithClear("Contato: ");
+    string description = InputWithClear("Descrição: ");
 
-    std::cout << "______________________________" << std::endl;
-    std::cout << "Nome: " << name << std::endl;
-    std::cout << "Empresa: " << company << std::endl;
-    std::cout << "Contato: " << contact << std::endl;
-    std::cout << "Descrição: " << description << std::endl;
-    std::cout << "______________________________" << std::endl;
+    cout << "______________________________" << endl;
+    cout << "Nome: " << name << endl;
+    cout << "Empresa: " << company << endl;
+    cout << "Contato: " << contact << endl;
+    cout << "Descrição: " << description << endl;
+    cout << "______________________________" << endl;
 
     if (Confirm("Deseja salvar este fornecedor?")) {
         int lastID = DatabaseManager::GetLastID(".Database/Fornecedores.csv") + 1;
         if (lastID == -1) return;
-        std::stringstream data;
+        stringstream data;
         data << lastID << "," << name << "," << company << "," << contact << "," << description;
         DatabaseManager::AppendToFile(".Database/Fornecedores.csv", data.str());
         ClearScreen();
-        std::cout << "Fornecedor salvo com sucesso, aguarde...";
+        cout << "Fornecedor salvo com sucesso, aguarde...";
         Pause(2);
     }
 
     ClearScreen();
-    std::cout << "Voltando para o menu...";
+    cout << "Voltando para o menu...";
     Pause(1);
 }
 
@@ -115,43 +116,43 @@ void AddSuppliers() {
 void ReadSuppliers() {
     ClearScreen();
     DatabaseManager::DisplayFileContents(".Database/Fornecedores.csv");
-    std::cout << "[S] Para Sair: ";
-    std::string option;
-    std::cin >> option;
+    cout << "[S] Para Sair: ";
+    string option;
+    cin >> option;
     ClearScreen();
-    std::cout << "Voltando para o menu, aguarde...";
+    cout << "Voltando para o menu, aguarde...";
     Pause(2);
 }
 
 // Função para adicionar itens ao estoque
 void AddStockItem() {
-    std::string item = InputWithClear("Produto: ");
-    std::string quantity = InputWithClear("Quantidade: ");
-    std::string expiry = InputWithClear("Validade: ");
-    std::string pricePerKG = InputWithClear("Valor por KG: ");
-    std::string alertLimit = InputWithClear("Limite de alerta: ");
+    string item = InputWithClear("Produto: ");
+    string quantity = InputWithClear("Quantidade: ");
+    string expiry = InputWithClear("Validade: ");
+    string pricePerKG = InputWithClear("Valor por KG: ");
+    string alertLimit = InputWithClear("Limite de alerta: ");
 
-    std::cout << "______________________________" << std::endl;
-    std::cout << "Item: " << item << std::endl;
-    std::cout << "Quantidade: " << quantity << std::endl;
-    std::cout << "Valor por KG: R$ " << pricePerKG << std::endl;
-    std::cout << "Validade: " << expiry << std::endl;
-    std::cout << "Alerta: " << alertLimit << std::endl;
-    std::cout << "______________________________" << std::endl;
+    cout << "______________________________" << endl;
+    cout << "Item: " << item << endl;
+    cout << "Quantidade: " << quantity << endl;
+    cout << "Valor por KG: R$ " << pricePerKG << endl;
+    cout << "Validade: " << expiry << endl;
+    cout << "Alerta: " << alertLimit << endl;
+    cout << "______________________________" << endl;
 
     if (Confirm("Deseja salvar este produto?")) {
         int lastID = DatabaseManager::GetLastID(".Database/stock.csv") + 1;
         if (lastID == -1) return;
-        std::stringstream data;
+        stringstream data;
         data << lastID << "," << item << "," << quantity << "," << pricePerKG << "," << expiry << "," << alertLimit;
         DatabaseManager::AppendToFile(".Database/stock.csv", data.str());
         ClearScreen();
-        std::cout << "Produto salvo com sucesso, aguarde...";
+        cout << "Produto salvo com sucesso, aguarde...";
         Pause(2);
     }
 
     ClearScreen();
-    std::cout << "Voltando ao menu principal...";
+    cout << "Voltando ao menu principal...";
     Pause(1);
 }
 
@@ -159,25 +160,26 @@ void AddStockItem() {
 void ReadStock() {
     ClearScreen();
     DatabaseManager::DisplayFileContents(".Database/stock.csv");
-    std::cout << "[S] Para Sair: ";
-    std::string option;
-    std::cin >> option;
+    cout << "[S] Para Sair: ";
+    string option;
+    cin >> option;
     ClearScreen();
-    std::cout << "Voltando para o menu, aguarde...";
+    cout << "Voltando para o menu, aguarde...";
     Pause(2);
 }
 
 // Verifica as credenciais de login e retorna o cargo do usuário
-std::string VerifyLogin(const std::string& userLogin, const std::string& userPassword) {
-    std::ifstream loginReader(".Database/users.csv");
+string VerifyLogin(const string& userLogin, const string& userPassword) {
+    ifstream loginReader(".Database/users.csv");
     if (!loginReader) {
-        std::cerr << "Erro ao abrir o arquivo: .Database/users.csv" << std::endl;
+        cerr << "Erro ao abrir o arquivo: .Database/users.csv" << endl;
         return "Erro";
     }
 
-    std::string output, id, login, password, role;
+    string output, id, login, password, role;
+    
     while (getline(loginReader, output)) {
-        std::stringstream ss(output);
+        stringstream ss(output);
         getline(ss, id, ',');
         getline(ss, login, ',');
         getline(ss, password, ',');
@@ -192,29 +194,29 @@ std::string VerifyLogin(const std::string& userLogin, const std::string& userPas
 
 // Função para adicionar novos logins ao sistema
 void AddLogin() {
-    std::string login = InputWithClear("Login: ");
-    std::string password = InputWithClear("Senha: ");
-    std::string role = InputWithClear("Cargo: ");
+    string login = InputWithClear("Login: ");
+    string password = InputWithClear("Senha: ");
+    string role = InputWithClear("Cargo: ");
 
-    std::cout << "______________________________" << std::endl;
-    std::cout << "Login: " << login << std::endl;
-    std::cout << "Senha: " << password << std::endl;
-    std::cout << "Cargo: " << role << std::endl;
-    std::cout << "______________________________" << std::endl;
+    cout << "______________________________" << endl;
+    cout << "Login: " << login << endl;
+    cout << "Senha: " << password << endl;
+    cout << "Cargo: " << role << endl;
+    cout << "______________________________" << endl;
 
     if (Confirm("Deseja cadastrar este login?")) {
         int lastID = DatabaseManager::GetLastID(".Database/users.csv") + 1;
         if (lastID == -1) return;
-        std::stringstream data;
+        stringstream data;
         data << lastID << "," << login << "," << password << "," << role;
         DatabaseManager::AppendToFile(".Database/users.csv", data.str());
         ClearScreen();
-        std::cout << "Login cadastrado com sucesso, aguarde...";
+        cout << "Login cadastrado com sucesso, aguarde...";
         Pause(2);
     }
 
     ClearScreen();
-    std::cout << "Voltando ao menu principal...";
+    cout << "Voltando ao menu principal...";
     Pause(1);
 }
 
@@ -222,11 +224,11 @@ void AddLogin() {
 void ReadLogins() {
     ClearScreen();
     DatabaseManager::DisplayFileContents(".Database/users.csv");
-    std::cout << "[S] Para Sair: ";
-    std::string option;
-    std::cin >> option;
+    cout << "[S] Para Sair: ";
+    string option;
+    cin >> option;
     ClearScreen();
-    std::cout << "Voltando para o menu, aguarde...";
+    cout << "Voltando para o menu, aguarde...";
     Pause(2);
 }
 
@@ -250,22 +252,22 @@ enum class MenuOptionEmployee {
 
 // Exibe o menu para o administrador
 void ShowAdminMenu() {
-    std::cout << "1 - Adicionar Fornecedor" << std::endl;
-    std::cout << "2 - Ler Fornecedores" << std::endl;
-    std::cout << "3 - Adicionar Produto ao Estoque" << std::endl;
-    std::cout << "4 - Ler Produtos em Estoque" << std::endl;
-    std::cout << "5 - Adicionar Login" << std::endl;
-    std::cout << "6 - Ler Logins" << std::endl;
-    std::cout << "7 - Sair" << std::endl;
-    std::cout << "Escolha uma opção: ";
+    cout << "1 - Adicionar Fornecedor" << endl;
+    cout << "2 - Ler Fornecedores" << endl;
+    cout << "3 - Adicionar Produto ao Estoque" << endl;
+    cout << "4 - Ler Produtos em Estoque" << endl;
+    cout << "5 - Adicionar Login" << endl;
+    cout << "6 - Ler Logins" << endl;
+    cout << "7 - Sair" << endl;
+    cout << "Escolha uma opção: ";
 }
 
 // Exibe o menu para o funcionário
 void ShowEmployeeMenu() {
-    std::cout << "1 - Ler Fornecedores" << std::endl;
-    std::cout << "2 - Ler Produtos em Estoque" << std::endl;
-    std::cout << "3 - Sair" << std::endl;
-    std::cout << "Escolha uma opção: ";
+    cout << "1 - Ler Fornecedores" << endl;
+    cout << "2 - Ler Produtos em Estoque" << endl;
+    cout << "3 - Sair" << endl;
+    cout << "Escolha uma opção: ";
 }
 
 // Gerencia o menu do administrador
@@ -274,7 +276,7 @@ void HandleAdminMenu() {
     int choice;
     do {
         ShowAdminMenu();
-        std::cin >> choice;
+        cin >> choice;
         option = static_cast<MenuOptionAdmin>(choice);
         ClearScreen();
         switch (option) {
@@ -297,11 +299,11 @@ void HandleAdminMenu() {
                 ReadLogins();
                 break;
             case MenuOptionAdmin::Exit:
-                std::cout << "Saindo, aguarde..." << std::endl;
+                cout << "Saindo, aguarde..." << endl;
                 Pause(2);
                 break;
             default:
-                std::cout << "Opção inválida, tente novamente." << std::endl;
+                cout << "Opção inválida, tente novamente." << endl;
                 Pause(2);
                 break;
         }
@@ -315,7 +317,7 @@ void HandleEmployeeMenu() {
     int choice;
     do {
         ShowEmployeeMenu();
-        std::cin >> choice;
+        cin >> choice;
         option = static_cast<MenuOptionEmployee>(choice);
         ClearScreen();
         switch (option) {
@@ -326,11 +328,11 @@ void HandleEmployeeMenu() {
                 ReadStock();
                 break;
             case MenuOptionEmployee::Exit:
-                std::cout << "Saindo, aguarde..." << std::endl;
+                cout << "Saindo, aguarde..." << endl;
                 Pause(2);
                 break;
             default:
-                std::cout << "Opção inválida, tente novamente." << std::endl;
+                cout << "Opção inválida, tente novamente." << endl;
                 Pause(2);
                 break;
         }
@@ -341,18 +343,18 @@ void HandleEmployeeMenu() {
 // Função principal
 int main() {
     ClearScreen();
-    std::string login = InputWithClear("Login: ");
-    std::string password = InputWithClear("Senha: ");
+    string login = InputWithClear("Login: ");
+    string password = InputWithClear("Senha: ");
 
     ClearScreen();
-    std::string role = VerifyLogin(login, password);
+    string role = VerifyLogin(login, password);
 
     if (role == "Admin") {
         HandleAdminMenu();
     } else if (role == "Funcionario") {
         HandleEmployeeMenu();
     } else {
-        std::cout << "Credenciais inválidas, encerrando o programa." << std::endl;
+        cout << "Credenciais inválidas, encerrando o programa." << endl;
         Pause(2);
     }
 
