@@ -7,8 +7,10 @@
 #include <functional>
 #include <iomanip>
 
+// Gerenciador de banco de dados para manipulação de arquivos
 class DatabaseManager {
 public:
+    // Obtém o último ID registrado no arquivo
     static int GetLastID(const std::string& filepath) {
         std::ifstream file(filepath);
         if (!file) {
@@ -23,6 +25,7 @@ public:
         return lastID.empty() ? 0 : std::stoi(lastID);
     }
 
+    // Adiciona dados ao final do arquivo
     static void AppendToFile(const std::string& filepath, const std::string& data) {
         std::ofstream file(filepath, std::ios::app);
         if (file.is_open()) {
@@ -32,6 +35,7 @@ public:
         }
     }
 
+    // Exibe o conteúdo do arquivo no console
     static void DisplayFileContents(const std::string& filepath) {
         std::ifstream file(filepath);
         if (!file) {
@@ -47,14 +51,17 @@ public:
     }
 };
 
+// Limpa a tela usando código de escape ANSI
 void ClearScreen() {
     std::cout << "\033[2J\033[1;1H";
 }
 
+// Pausa a execução do programa por um determinado número de segundos
 void Pause(int seconds) {
     std::this_thread::sleep_for(std::chrono::seconds(seconds));
 }
 
+// Solicita uma confirmação do usuário
 bool Confirm(const std::string& prompt) {
     std::string option;
     std::cout << prompt << " (S/N): ";
@@ -62,6 +69,7 @@ bool Confirm(const std::string& prompt) {
     return option == "S" || option == "s";
 }
 
+// Obtém entrada do usuário com limpeza de buffer
 std::string InputWithClear(const std::string& prompt) {
     std::string input;
     do {
@@ -73,6 +81,7 @@ std::string InputWithClear(const std::string& prompt) {
     return input;
 }
 
+// Função para adicionar fornecedores ao sistema
 void AddSuppliers() {
     std::string name = InputWithClear("Nome: ");
     std::string company = InputWithClear("Empresa: ");
@@ -102,6 +111,7 @@ void AddSuppliers() {
     Pause(1);
 }
 
+// Função para ler os fornecedores cadastrados
 void ReadSuppliers() {
     ClearScreen();
     DatabaseManager::DisplayFileContents(".Database/Fornecedores.csv");
@@ -113,6 +123,7 @@ void ReadSuppliers() {
     Pause(2);
 }
 
+// Função para adicionar itens ao estoque
 void AddStockItem() {
     std::string item = InputWithClear("Produto: ");
     std::string quantity = InputWithClear("Quantidade: ");
@@ -144,6 +155,7 @@ void AddStockItem() {
     Pause(1);
 }
 
+// Função para ler os itens do estoque
 void ReadStock() {
     ClearScreen();
     DatabaseManager::DisplayFileContents(".Database/stock.csv");
@@ -155,6 +167,7 @@ void ReadStock() {
     Pause(2);
 }
 
+// Verifica as credenciais de login e retorna o cargo do usuário
 std::string VerifyLogin(const std::string& userLogin, const std::string& userPassword) {
     std::ifstream loginReader(".Database/users.csv");
     if (!loginReader) {
@@ -177,6 +190,7 @@ std::string VerifyLogin(const std::string& userLogin, const std::string& userPas
     return "Login não encontrado";
 }
 
+// Função para adicionar novos logins ao sistema
 void AddLogin() {
     std::string login = InputWithClear("Login: ");
     std::string password = InputWithClear("Senha: ");
@@ -204,6 +218,7 @@ void AddLogin() {
     Pause(1);
 }
 
+// Função para ler os logins cadastrados
 void ReadLogins() {
     ClearScreen();
     DatabaseManager::DisplayFileContents(".Database/users.csv");
@@ -215,6 +230,7 @@ void ReadLogins() {
     Pause(2);
 }
 
+// Enumeração para as opções do menu do administrador
 enum class MenuOptionAdmin {
     AddSupplier = 1,
     ReadSuppliers,
@@ -225,12 +241,14 @@ enum class MenuOptionAdmin {
     Exit
 };
 
+// Enumeração para as opções do menu do funcionário
 enum class MenuOptionEmployee {
     ReadSuppliers = 1,
     ReadStock,
     Exit
 };
 
+// Exibe o menu para o administrador
 void ShowAdminMenu() {
     std::cout << "1 - Adicionar Fornecedor" << std::endl;
     std::cout << "2 - Ler Fornecedores" << std::endl;
@@ -242,6 +260,7 @@ void ShowAdminMenu() {
     std::cout << "Escolha uma opção: ";
 }
 
+// Exibe o menu para o funcionário
 void ShowEmployeeMenu() {
     std::cout << "1 - Ler Fornecedores" << std::endl;
     std::cout << "2 - Ler Produtos em Estoque" << std::endl;
@@ -249,6 +268,7 @@ void ShowEmployeeMenu() {
     std::cout << "Escolha uma opção: ";
 }
 
+// Gerencia o menu do administrador
 void HandleAdminMenu() {
     MenuOptionAdmin option;
     int choice;
@@ -289,6 +309,7 @@ void HandleAdminMenu() {
     } while (option != MenuOptionAdmin::Exit);
 }
 
+// Gerencia o menu do funcionário
 void HandleEmployeeMenu() {
     MenuOptionEmployee option;
     int choice;
@@ -317,6 +338,7 @@ void HandleEmployeeMenu() {
     } while (option != MenuOptionEmployee::Exit);
 }
 
+// Função principal
 int main() {
     ClearScreen();
     std::string login = InputWithClear("Login: ");
