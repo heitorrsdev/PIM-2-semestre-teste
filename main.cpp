@@ -44,10 +44,10 @@ public:
             return;
         }
         string line;
-        cout << "______________________________" << endl;
+        cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+--+" << endl;
         while (getline(file, line)) {
             cout << line << endl;
-            cout << "______________________________" << endl;
+            cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+--+" << endl;
         }
     }
 };
@@ -75,7 +75,6 @@ string InputWithClear(const string& prompt) {
     string input;
     while (input.empty()) {
         cout << prompt;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         getline(cin, input);
         ClearScreen();
     }
@@ -89,12 +88,12 @@ void AddSuppliers() {
     string contact = InputWithClear("Contato: ");
     string description = InputWithClear("Descrição: ");
 
-    cout << "______________________________" << endl;
+    cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+--+" << endl;
     cout << "Nome: " << name << endl;
     cout << "Empresa: " << company << endl;
     cout << "Contato: " << contact << endl;
     cout << "Descrição: " << description << endl;
-    cout << "______________________________" << endl;
+    cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+--+" << endl;
 
     if (Confirm("Deseja salvar este fornecedor?")) {
         int lastID = DatabaseManager::GetLastID(".Database/Fornecedores.csv") + 1;
@@ -132,13 +131,13 @@ void AddStockItem() {
     string pricePerKG = InputWithClear("Valor por KG: ");
     string alertLimit = InputWithClear("Limite de alerta: ");
 
-    cout << "______________________________" << endl;
+    cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+--+" << endl;
     cout << "Item: " << item << endl;
     cout << "Quantidade: " << quantity << endl;
     cout << "Valor por KG: R$ " << pricePerKG << endl;
     cout << "Validade: " << expiry << endl;
     cout << "Alerta: " << alertLimit << endl;
-    cout << "______________________________" << endl;
+    cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+--+" << endl;
 
     if (Confirm("Deseja salvar este produto?")) {
         int lastID = DatabaseManager::GetLastID(".Database/stock.csv") + 1;
@@ -171,10 +170,10 @@ void ReadStock() {
 // Verifica as credenciais de login e retorna o cargo do usuário
 string VerifyLogin(const string& userLogin, const string& userPassword) {
     ifstream loginReader(".Database/users.csv");
-    if (!loginReader) {
-        cerr << "Erro ao abrir o arquivo: .Database/users.csv" << endl;
-        return "Erro";
-    }
+    // if (!loginReader) {
+    //     cerr << "Erro ao abrir o arquivo: .Database/users.csv" << endl;
+    //     return "Erro";
+    // }
 
     string output, id, login, password, role;
     
@@ -198,11 +197,11 @@ void AddLogin() {
     string password = InputWithClear("Senha: ");
     string role = InputWithClear("Cargo: ");
 
-    cout << "______________________________" << endl;
+    cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+--+" << endl;
     cout << "Login: " << login << endl;
     cout << "Senha: " << password << endl;
     cout << "Cargo: " << role << endl;
-    cout << "______________________________" << endl;
+    cout << "+-+-+-+-+-+-+-+-+-+-+-+-+-+--+" << endl;
 
     if (Confirm("Deseja cadastrar este login?")) {
         int lastID = DatabaseManager::GetLastID(".Database/users.csv") + 1;
@@ -308,7 +307,7 @@ void HandleAdminMenu() {
                 cout << "Saindo, aguarde..." << endl;
                 Pause(2);
                 break;
-                
+
             default:
                 cout << "Opção inválida, tente novamente." << endl;
                 Pause(2);
@@ -351,20 +350,28 @@ void HandleEmployeeMenu() {
 // Função principal
 int main() {
     ClearScreen();
-    string login = InputWithClear("Login: ");
-    string password = InputWithClear("Senha: ");
+    bool unvalidRole = true;
+    while (unvalidRole)
+    {
+        ClearScreen();
+        string login = InputWithClear("Login: ");
+        string password = InputWithClear("Senha: ");
 
-    ClearScreen();
-    string role = VerifyLogin(login, password);
+        ClearScreen();
+        string role = VerifyLogin(login, password);
 
-    if (role == "Admin") {
-        HandleAdminMenu();
-    } else if (role == "Funcionario") {
-        HandleEmployeeMenu();
-    } else {
-        cout << "Credenciais inválidas, encerrando o programa." << endl;
-        Pause(2);
+        if (role == "Admin") {
+            unvalidRole = false;
+            HandleAdminMenu();
+        } else if (role == "Funcionario") {
+            unvalidRole = false;
+            HandleEmployeeMenu();
+        } else {
+            cout << "Credenciais inválidas! Informe os dados novamente." << endl;
+            Pause(5.5);
+        }
     }
+    
 
     return 0;
 }
